@@ -72,32 +72,44 @@ TreeNode* exp = &s13;
 
 float evaluate(TreeNode* root)
 {
-
+    // 노드가 NULL인 경우, 0을 반환합니다.
     if (root == NULL)
         return 0;
+
+    // root->left 와 root->right가 NULL일 경우, 해당 노드의 데이터 값을 반환
     if (root->left == NULL && root->right == NULL)
         return root->data;
     else {
+        // 왼쪽 서브트리를 계산하여 op1에 저장.
         float op1 = evaluate(root->left);
+
+        // 오른쪽 서브트리를 계산하여 op2에 저장
         float op2 = evaluate(root->right);
+
+
         printf("%0.2f %c %0.2f = ", op1, root->data, op2);
 
         switch (root->data) {
         case '+':
+            // 덧셈 연산을 수행 후 결과를 출력
             printf("%0.2f\n", op1 + op2);
             return op1 + op2;
         case '-':
+            // 뺄셈 연산을 수행 후 결과를 출력
             printf("%0.2f\n", op1 - op2);
             return op1 - op2;
         case '*':
+            // 곱셈 연산을 수행 후 결과를 출력
             printf("%0.2f\n", op1 * op2);
             return op1 * op2;
         case '/':
+            // 나눗셈 연산을 수행 후 결과를 출력
             printf("%0.2f\n", op1 / op2);
             return op1 / op2;
         }
 
     }
+
     return 0;
 }
 int main(void)
