@@ -1,111 +1,183 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
-#define SIZE 100
+#include <string.h>
+#define _CRT_SECURE_NO_WARNINGS
 
+typedef int element;
 typedef struct TreeNode {
-    int data;
+    element key;
     struct TreeNode* left, * right;
 } TreeNode;
 
-int top = -1;
-TreeNode* stack[SIZE];
+int cnt = 0;
 
-void push(TreeNode* p)
+TreeNode* new_node(int item)
 {
-    if (top < SIZE - 1)
-        stack[++top] = p;
+    TreeNode* temp = (TreeNode*)malloc(sizeof(TreeNode));
+    temp->key = item;
+    temp->left = temp->right = NULL;
+    return temp;
 }
 
-TreeNode* pop()
+TreeNode* insert_node(TreeNode* node, int key)
 {
-    TreeNode* p = NULL;
-    if (top >= 0)
-        p = stack[top--];
-    return p;
+    if (node == NULL) return new_node(key);
+    if (key < node->key)
+        node->left = insert_node(node->left, key);
+    else if (key > node->key)
+        node->right = insert_node(node->right, key);
+    cnt++;
+    return node;
 }
 
-int get_node_count_iter(TreeNode* root)
+TreeNode* min_value_node(TreeNode* node)
 {
-    int count = 0;
+    TreeNode* current = node;
+    while (current->left != NULL)
+        current = current->left;
+    return current;
+}
+
+TreeNode* delete_node(TreeNode* root, int key)
+{
     if (root == NULL)
-        return count;
-
-    TreeNode* stack[100]; // 스택을 사용하여 노드를 저장
-    int top = -1;
-
-    stack[++top] = root; // 루트 노드를 스택에 추가
-
-    while (top >= 0) {
-        TreeNode* current = stack[top--]; // 스택에서 노드를 꺼내옴
-        count++; // 노드 카운트 증가
-
-        // 오른쪽 자식을 먼저 스택에 추가
-        if (current->right)
-            stack[++top] = current->right;
-
-        // 왼쪽 자식을 스택에 추가
-        if (current->left)
-            stack[++top] = current->left;
+        return root;
+    if (key < root->key)
+        root->left = delete_node(root->left, key);
+    else if (key > root->key)
+        root->right = delete_node(root->right, key);
+    else
+    {
+        if (root->left == NULL)
+        {
+            TreeNode* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL)
+        {
+            TreeNode* temp = root->left;
+            free(root);
+            return temp;
+        }
+        TreeNode* temp = min_value_node(root->right);
+        root->key = temp->key;
+        root->right = delete_node(root->right, temp->key);
     }
-
-    return count;
+    return root;
 }
 
-
-
-
-TreeNode s1 = { 4.0, NULL,NULL };
-TreeNode s2 = { 5.0, NULL,NULL };
-TreeNode s3 = { '*',&s1,&s2 };
-TreeNode s4 = { 3.0, NULL,NULL };
-TreeNode s5 = { '+', &s4,&s3 };
-TreeNode s6 = { 2.0, NULL,NULL };
-TreeNode s7 = { '+', &s6,&s5 };
-TreeNode s8 = { 6.0, NULL,NULL };
-TreeNode s9 = { 7.0, NULL,NULL };
-TreeNode s10 = { '/', &s8,&s9 };
-TreeNode s11 = { '-', &s7,&s10 };
-TreeNode s12 = { 9.0, NULL,NULL };
-TreeNode s13 = { '+', &s11,&s12 };
-TreeNode* exp = &s13;
-
-float evaluate(TreeNode* root)
-{
-
-    if (root == NULL)
-        return 0;
-    if (root->left == NULL && root->right == NULL)
-        return root->data;
-    else {
-        float op1 = evaluate(root->left);
-        float op2 = evaluate(root->right);
-        printf("%0.2f %c %0.2f = ", op1, root->data, op2);
-
-        switch (root->data) {
-        case '+':
-            printf("%0.2f\n", op1 + op2);
-            return op1 + op2;
-        case '-':
-            printf("%0.2f\n", op1 - op2);
-            return op1 - op2;
-        case '*':
-            printf("%0.2f\n", op1 * op2);
-            return op1 * op2;
-        case '/':
-            printf("%0.2f\n", op1 / op2);
-            return op1 / op2;
+TreeNode* search(TreeNode* root, int key) {
+    TreeNode* node = root;
+    while (node != NULL) {
+        cnt++;
+        if (key == node->key)
+        {
+            return node;
+        }
+        else if (key < node->key)
+        {
+            node = node->left;
+        }
+        else {
+            node = node->right;
         }
 
     }
-    return 0;
+    return NULL;
 }
+
+
+void inorder(TreeNode* root)
+{
+    if (root) {
+        cnt++;
+        inorder(root->left);
+        printf("%d ", root->key);
+        inorder(root->right);
+    }
+}
+
+TreeNode s1 = { 25, NULL, NULL };
+TreeNode s2 = { 16, NULL, &s1 };
+TreeNode s3 = { 42, NULL, NULL };
+TreeNode s4 = { 46, &s3, NULL };
+TreeNode s5 = { 55, NULL, NULL };
+TreeNode s6 = { 53, &s4, &s5 };
+TreeNode s7 = { 41, &s2, &s6 };
+TreeNode s8 = { 62, NULL, NULL };
+TreeNode s9 = { 64, NULL, NULL };
+TreeNode s10 = { 63, &s8, &s9 };
+TreeNode s11 = { 70, NULL, NULL };
+TreeNode s12 = { 65, &s10, &s11 };
+TreeNode s13 = { 74, &s12, NULL };
+TreeNode s14 = { 60, &s7, &s13 };
+TreeNode* root = &s14;
+
 int main(void)
 {
 
-    printf("수식의 값은 %0.2f입니다.\n", evaluate(exp));
 
-    int nodeCount = get_node_count_iter(exp); // 반복적 방법으로 노드의 개수 계산
-    printf("\n총 노드의 개수는 %d 입니다.\n", nodeCount);
+    char c;
+    int n = 0;
+    printf("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
+    printf("| s     : 검색             |\n");
+    printf("| i     : 노드 추가        |\n");
+    printf("| d     : 노드 삭제        |\n");
+    printf("| t     : 중위 순회        |\n");
+    printf("| I     : 노드 추가(반복)  |\n");
+    printf("| D     : 노드 삭제(반복)  |\n");
+    printf("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
+
+
+
+
+    while (1) {
+        printf("메뉴 입력: ");
+        scanf_s(" %c", &c, sizeof(c));  // 문자 입력 오류 방지
+        if (c == 's') {
+            printf("검색할 값 입력: ");
+            scanf_s("%d", &n);
+            TreeNode* result = search(root, n);
+            if (result != NULL && n == result->key) {
+                printf("방문한 노드의 수: %d\n", cnt);
+                printf("검색 성공: %d\n", result->key);
+                printf("중위 순회 결과: ");
+                inorder(root);
+                printf("\n");
+                cnt = 0;
+            }
+            else {
+                printf("검색 실패.\n");
+            }
+        }
+        else if (c == 'i')
+        {
+
+            printf("삽입할 값 입력: ");
+            scanf_s("%d", &n);
+            TreeNode* result = search(root, n);
+            insert_node(root, n);
+            printf("방문한 노드의 수: %d\n", cnt);
+            inorder(root);
+            printf("\n\n");
+            cnt = 0;
+        }
+        else if (c == 'd') {
+            printf("삭제할 값 입력: ");
+            scanf_s("%d", &n);
+            delete_node(root, n);
+            printf("방문한 노드의 수: %d\n", cnt);
+            inorder(root);
+            printf("\n\n");
+            cnt = 0;
+        }
+        else if (c == 't') {
+            inorder(root);
+            printf("\n방문한 노드의 수: %d\n", cnt);
+            printf("\n\n");
+            cnt = 0;
+        }
+    }
     return 0;
 }
