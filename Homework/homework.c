@@ -178,6 +178,12 @@ int main(void)
             printf("\n\n");
             cnt = 0;
         }
+        else if (c == "c")
+        {
+            printf("Á¾·á");
+            break;
+        }
+            
     }
     return 0;
 }
