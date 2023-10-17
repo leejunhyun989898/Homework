@@ -1,111 +1,95 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
-#define SIZE 100
 
-typedef struct TreeNode {
-    int data;
-    struct TreeNode* left, * right;
-} TreeNode;
+typedef int element;
+typedef struct HeapType {
+    element* heap;
+    int heap_size;
+} HeapType;
 
-int top = -1;
-TreeNode* stack[SIZE];
-
-void push(TreeNode* p)
-{
-    if (top < SIZE - 1)
-        stack[++top] = p;
+// 최대 힙을 생성
+HeapType* create(int size) {
+    HeapType* h = (HeapType*)malloc(sizeof(HeapType));
+    h->heap = (element*)malloc(sizeof(element) * (size + 1));
+    h->heap_size = 0;
+    return h;
 }
 
-TreeNode* pop()
-{
-    TreeNode* p = NULL;
-    if (top >= 0)
-        p = stack[top--];
-    return p;
+// 힙 초기화
+void init(HeapType* h) {
+    h->heap_size = 0;
 }
 
-int get_node_count_iter(TreeNode* root)
-{
-    int count = 0;
-    if (root == NULL)
-        return count;
+// 최대 힙에 원소를 삽입
+void insert_max_heap(HeapType* h, element item) {
+    int i;
+    i = ++(h->heap_size);
 
-    TreeNode* stack[100]; // 스택을 사용하여 노드를 저장
-    int top = -1;
+    while ((i != 1) && (item > h->heap[i / 2])) {
+        h->heap[i] = h->heap[i / 2];
+        i /= 2;
+    }
+    h->heap[i] = item;
+}
 
-    stack[++top] = root; // 루트 노드를 스택에 추가
+// 최대 힙에서 원소를 삭제하고 반환
+element delete_max_heap(HeapType* h) {
+    int parent, child;
+    element item, temp;
+    item = h->heap[1];
+    temp = h->heap[(h->heap_size)--];
+    parent = 1;
+    child = 2;
 
-    while (top >= 0) {
-        TreeNode* current = stack[top--]; // 스택에서 노드를 꺼내옴
-        count++; // 노드 카운트 증가
+    while (child <= h->heap_size) {
+        if ((child < h->heap_size) && (h->heap[child] < h->heap[child + 1]))
+            child++;
+        if (temp >= h->heap[child])
+            break;
+        h->heap[parent] = h->heap[child];
+        parent = child;
+        child *= 2;
+    }
+    h->heap[parent] = temp;
+    return item;
+}
 
-        // 오른쪽 자식을 먼저 스택에 추가
-        if (current->right)
-            stack[++top] = current->right;
+// 배열을 출력
+void print_array(element a[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", a[i]);
+    }
+    printf("\n");
+}
 
-        // 왼쪽 자식을 스택에 추가
-        if (current->left)
-            stack[++top] = current->left;
+// 힙 정렬을 수행
+void heap_sort(element a[], int n) {
+    int i;
+    HeapType* h;
+    h = create(n);
+    init(h);
+
+    for (i = 0; i < n; i++) {
+        insert_max_heap(h, a[i]);
+        print_array(h->heap + 1, h->heap_size);
     }
 
-    return count;
-}
-
-
-
-
-TreeNode s1 = { 4.0, NULL,NULL };
-TreeNode s2 = { 5.0, NULL,NULL };
-TreeNode s3 = { '*',&s1,&s2 };
-TreeNode s4 = { 3.0, NULL,NULL };
-TreeNode s5 = { '+', &s4,&s3 };
-TreeNode s6 = { 2.0, NULL,NULL };
-TreeNode s7 = { '+', &s6,&s5 };
-TreeNode s8 = { 6.0, NULL,NULL };
-TreeNode s9 = { 7.0, NULL,NULL };
-TreeNode s10 = { '/', &s8,&s9 };
-TreeNode s11 = { '-', &s7,&s10 };
-TreeNode s12 = { 9.0, NULL,NULL };
-TreeNode s13 = { '+', &s11,&s12 };
-TreeNode* exp = &s13;
-
-float evaluate(TreeNode* root)
-{
-
-    if (root == NULL)
-        return 0;
-    if (root->left == NULL && root->right == NULL)
-        return root->data;
-    else {
-        float op1 = evaluate(root->left);
-        float op2 = evaluate(root->right);
-        printf("%0.2f %c %0.2f = ", op1, root->data, op2);
-
-        switch (root->data) {
-        case '+':
-            printf("%0.2f\n", op1 + op2);
-            return op1 + op2;
-        case '-':
-            printf("%0.2f\n", op1 - op2);
-            return op1 - op2;
-        case '*':
-            printf("%0.2f\n", op1 * op2);
-            return op1 * op2;
-        case '/':
-            printf("%0.2f\n", op1 / op2);
-            return op1 / op2;
-        }
-
+    for (i = n - 1; i >= 0; i--) {
+        a[i] = delete_max_heap(h);
+        print_array(h->heap + 1, h->heap_size);
     }
-    return 0;
+
+    free(h);
 }
-int main(void)
-{
 
-    printf("수식의 값은 %0.2f입니다.\n", evaluate(exp));
+int main() {
+    element list[] = { 34,12,76,59,32,55,88,26,16,79,34,85,29,78,41,56,86 };
+    int n = sizeof(list) / sizeof(list[0]);
 
-    int nodeCount = get_node_count_iter(exp); // 반복적 방법으로 노드의 개수 계산
-    printf("\n총 노드의 개수는 %d 입니다.\n", nodeCount);
+    printf("<정렬>\n");
+    heap_sort(list, n);
+
+    print_array(list, n);
+
     return 0;
 }
