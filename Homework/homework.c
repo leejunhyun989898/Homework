@@ -155,7 +155,7 @@ void heap_sort(int a[], int n) {
 		printf("\n");
 	}
 
-	for (i = n - 1; i >= 0; i--) {
+	for (i = n - 1; i >= 1; i--) {
 		// 최소값을 가지는 두 개의 노드를 삭제
 		element e1 = delete_min_heap(h);
 		element e2 = delete_min_heap(h);
