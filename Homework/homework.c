@@ -77,7 +77,7 @@ void kruskal(GraphType* g) {
     struct Edge e;
     set_init(g->nvertex);       //집합 초기화
     qsort(g->edges, g->n, sizeof(struct Edge), compare);
-    printf("Kruskal MST Algorithm\n");
+    printf("Kruskal MST Algorithm(퀵 정렬 사용)\n");
     int i = 0;
     while(edge_a<(g->nvertex-1)){       //간선의 수 < n-1
         e = g->edges[i];
