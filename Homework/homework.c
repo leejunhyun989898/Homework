@@ -4,174 +4,121 @@
 
 #define TRUE 1
 #define FALSE 0
-#define MAX 10
+#define INF 1000
+#define MAX_VERTICES 100
+int parent[MAX_VERTICES]; //정점에 대한 부모 노드 저장 배열
 
-typedef int element;
-typedef struct {
-    int front;
-    int rear;
-    element data[MAX];
-}QueueType;
-
-void error(char* message)
+void set_init(int n)
 {
-    fprintf(stderr, "%s\n", message);
-
+    for (int i = 0; i < n; i++)
+        parent[i] = -1;
 }
-
-void init_queue(QueueType* q)
+//curr이 속하는 집합을 반환
+int set_find(int curr)
 {
-    q->front = q->rear = 0;
+    if (parent[curr] == -1)
+        return curr;
+    while (parent[curr] != -1) curr = parent[curr];
+    return curr;
 }
-
-
-
-int is_full(QueueType* q)
+//두개의 원속 속한 집합을 합침
+void set_union(int a, int b)
 {
-    return((q->rear + 1) % MAX == q->front);
+    int root1 = set_find(a);
+    int root2 = set_find(b);
+    if (root1 != root2)
+        parent[root1] = root2;
 }
-int is_empty(QueueType* q)
-{
-    return(q->front == q->rear);
+struct Edge{
+    int s, e, w;
+};
 
-}
-void enqueue(QueueType* q, int item)
-{
-    if (is_full(q)) {
-        error("큐가 포화상태");
-    }
-    q->rear = (q->rear + 1) % MAX;
-    q->data[(q->rear)] = item;
-}
-element dequeue(QueueType* q)
-{
-    if (is_empty(q))
-    {
-        error("큐 공백상태");
-    }
-    q->front = (q->front + 1) % MAX;
-    return q->data[q->front];
-
-}
-#define MAX_VERTICES 50
-
-typedef struct GrapNode {
-    int vertex;
-    struct GraphNode* link;
-}GraphNode;
 typedef struct GraphType {
-    int n;
-    int adj_mat[MAX_VERTICES][MAX_VERTICES];
+    int n;              //간선개수
+    int nvertex;        //정점의 개수
+    struct Edge edges[2 * MAX_VERTICES];
 }GraphType;
 
-int visited[MAX_VERTICES];
-void init(GraphType* g) {
-    int r, c;
-    g->n = 0;
-    for (r = 0; r < MAX_VERTICES; r++)
-        for (c = 0; c < MAX_VERTICES; c++)
-            g->adj_mat[r][c] = 0;
+//그래프 초기화
+void graph_init(GraphType* g)
+{
+    g->n = g->nvertex = 0;
+    for (int i = 0; i < 2 * MAX_VERTICES; i++)
+    {
+        g->edges[i].s = 0;
+        g->edges[i].e = 0;
+        g->edges[i].w = INF;
+
+    }
 }
 
-void insert_vertex(GraphType* g, int v)
+//간선 삽입 연산
+void insert_edge(GraphType* g, int s, int e, int w)
 {
-    if (((g->n) + 1) > MAX_VERTICES) {
-        fprintf(stderr, "그래프 : 정점의 개수 초과");
-        return;
-    }
+    g->edges[g->n].s = s;
+    g->edges[g->n].e = e;
+    g->edges[g->n].w = w;
     g->n++;
 }
-void insert_edge(GraphType* g, int start, int end)
-{
-    if (start >= g->n || end >= g->n) {
-        fprintf(stderr, "그래프 : 정점 번호 오류");
-        return;
+
+
+//두 원소를 비교하여 정렬 순서 결정 함수
+int compare(const void* a, const void* b) {
+    struct Edge* ea = (struct Edge*)a;
+    struct Edge* eb = (struct Edge*)b;
+    return ea->w - eb->w;
+}
+
+
+//kruskal 알고리즘
+void kruskal(GraphType* g) {
+    int edge_a = 0; //현재까지 선택된 간선의 수
+    int u, v;       //정점 u와 정점 v의 집합 번호
+    struct Edge e;
+    set_init(g->nvertex);       //집합 초기화
+    qsort(g->edges, g->n, sizeof(struct Edge), compare);
+    printf("Kruskal MST Algorithm\n");
+    int i = 0;
+    while(edge_a<(g->nvertex-1)){       //간선의 수 < n-1
+        e = g->edges[i];
+        u = set_find(e.s);              //정점 u의 집합 번호
+        v = set_find(e.e);              //정점 v의 집합 번호
+        if (u != v) {                   //서로 속한 집합이 다르면
+            printf("Edge (%d, %d) select %d\n", e.s, e.e, e.w);
+            edge_a++;
+            set_union(u, v);            //두개의 집합을 합침
+        }
+        i++;
     }
-    g->adj_mat[start][end] = 1;
-    g->adj_mat[end][start] = 1;
-}
 
-void dfs_mat(GraphType* g, int v)
-{
-    int w;
-    visited[v] = TRUE;
-    printf("%d ", v);
-    for (w = 0; w < g->n; w++)
-        if (g->adj_mat[v][w] && !visited[w])
-            dfs_mat(g, w);
 }
-
-void bfs_mat(GraphType* g, int v)
-{
-    int w;
-    QueueType q;
-    init_queue(&q);
-    visited[v] = TRUE;
-    printf("%d ", v);
-    enqueue(&q, v);
-    while (!is_empty(&q)) {
-        v = dequeue(&q);
-        for (w =0; w<g->n; w++)
-            if (g->adj_mat[v][w]&&!visited[w])
-            {
-                visited[w] = TRUE;
-                printf("%d ", w);
-                enqueue(&q, w);
-            }
-    }
-}
-
-void main()
-{
+int main() {
     GraphType* g;
     g = (GraphType*)malloc(sizeof(GraphType));
-    init(g);
-    for (int i = 0; i < 10; i++)
-        insert_vertex(g, i);
-    insert_edge(g, 0, 4);
-    
-    insert_edge(g, 1, 5);
-    insert_edge(g, 1, 4);
-    insert_edge(g, 1, 7);
-    insert_edge(g, 1, 10);
-    insert_edge(g, 2, 3);
-    insert_edge(g, 4, 0);
-    insert_edge(g, 4, 2);
-    insert_edge(g, 4, 3);
-    insert_edge(g, 4, 5);
-    insert_edge(g, 4, 6);
-    insert_edge(g, 4, 7);
-    insert_edge(g, 4, 6);
-    insert_edge(g, 4, 6); 
-    insert_edge(g, 5, 0);
-    insert_edge(g, 5, 3);
-    insert_edge(g, 6, 0);
-    insert_edge(g, 6, 8);
-    insert_edge(g, 7, 6);
-    insert_edge(g, 7, 10);
-    insert_edge(g, 10, 8);
-    insert_edge(g, 8, 9);
-    insert_edge(g, 0, 9);
-    printf("-----------------------\n");
-    printf("1    : 깊이 우선 탐색  |\n");
-    printf("2    : 너비 우선 탐색  |\n");
-    printf("3    : 종료            |\n");
-    printf("-----------------------\n");
-    int n,start,search;
-    
-    while (1) {
-        printf("메뉴 입력: ");
-        scanf_s("%d", &n);
-        printf("\n");
-        if (n == 1)
-        {
-            printf("시작 할 번호와 탐색할 값 입력: ");
-            scanf_s("%d %d", &start, &search);
-            dfs_mat(g, start);
-            printf("\n");
-        }
-    }
-    
+    graph_init(g);
+    g->nvertex = 10;
+    insert_edge(g, 1, 2, 3);
+    insert_edge(g, 1, 6, 11);
+    insert_edge(g, 1, 7, 12);
+    insert_edge(g, 2, 3, 5);
+    insert_edge(g, 2, 4, 4);
+    insert_edge(g, 2, 5, 1);
+    insert_edge(g, 2, 6, 7);
+    insert_edge(g, 2, 7, 8);
+    insert_edge(g, 3, 4, 2);
+    insert_edge(g, 3, 7, 6);
+    insert_edge(g, 3, 8, 5);
+    insert_edge(g, 4, 5, 13);
+    insert_edge(g, 4, 8, 14);
+    insert_edge(g, 4, 10, 16);
+    insert_edge(g, 5, 6, 9);
+    insert_edge(g, 5, 9, 18);
+    insert_edge(g, 5, 10, 17);
+    insert_edge(g, 7, 8, 13);
+    insert_edge(g, 8, 10, 15);
+    insert_edge(g, 9, 10, 10);
+
+    kruskal(g);
     free(g);
     return 0;
 }
