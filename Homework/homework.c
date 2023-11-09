@@ -30,8 +30,7 @@ int choose(int distance[], int n, int found[])
 
 void printf_status(GraphType* g)
 {
-	static int step = 1;
-	printf("STEP %d: ", step++);
+	printf("Distance: ");
 	for (int i = 0; i < g->n; i++)
 	{
 		if (distance[i] == INF)
@@ -59,7 +58,8 @@ void shortest_path(GraphType* g, int start)
 	}
 	found[start] = TRUE;
 	distance[start] = 0;
-	for (i = 0; i < g->n; i++)
+	array[0] = start + 1;
+	for (i = 1; i < (g->n); i++)
 	{
 		printf_status(g);
 		u = choose(distance, g->n, found);
@@ -68,7 +68,7 @@ void shortest_path(GraphType* g, int start)
 			if (!found[w])
 				if (distance[u] + g->weight[u][w] < distance[w])
 					distance[w] = distance[u] + g->weight[u][w];
-		array[i] = u+1;
+		array[i] = u + 1;
 	}
 	printf("\n");
 	for (j = 0; j < g->n; j++) {
@@ -90,6 +90,7 @@ int main(void)
 		{INF,INF,INF,INF,18,INF,INF,INF,0,10},
 		{INF,INF,INF,16,17,INF,INF,15,10,0}}
 	};
+	printf("인접 행렬로 구현\n");
 	shortest_path(&g, 0);
 	
 	return 0;
