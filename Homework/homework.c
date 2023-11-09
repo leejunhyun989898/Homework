@@ -70,7 +70,6 @@ void shortest_path(GraphType* g, int start)
 					distance[w] = distance[u] + g->weight[u][w];
 		array[i] = u + 1;
 	}
-	printf("\n");
 	for (j = 0; j < g->n; j++) {
 		printf("%d ", array[j]);
 	}
