@@ -1,71 +1,96 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h> 
+#include <limits.h>
 
 #define TRUE 1
 #define FALSE 0
-#define INF 1000L
-#define MAX_VERTICES 100
-
+#define MAX 100
+#define INF 1000000
 
 typedef struct GraphType {
-    int n;              //정점개수
-    int weight[MAX_VERTICES][MAX_VERTICES];
+	int n;
+	int weight[MAX][MAX];
 }GraphType;
 
-int selected[MAX_VERTICES];
-int distance[MAX_VERTICES];
+int found[MAX];
+int distance[MAX];
 
-//최소 dist[v] 값을 갖는 정점을 반환
-int get_min_vertex(int n) {
-    int v, i;
-    for (i = 0; i < n; i++) {
-        if (!selected[i]) {
-            v = i;
-            break;
-        }
-    }
-    for (i = 0; i < n; i++)
-        if (!selected[i] && (distance[i] < distance[v])) v = i;
-    return (v);
+int choose(int distance[], int n, int found[])
+{
+	int i, min, minpos;
+	min = INT_MAX;
+	minpos = -1;
+	for (i = 0; i < n; i++)
+		if (distance[i] < min && !found[i]) {
+			min = distance[i];
+			minpos = i;
+		}
+	return minpos;
 }
 
-//prim 알고리즘
-void prim(GraphType* g, int s) {
-    int i, u, v;
-    for (u = 0; u < g->n; u++) {
-        distance[u] = INF;
-    }
-    distance[s] = 0;
+void printf_status(GraphType* g)
+{
+	static int step = 1;
+	printf("STEP %d: ", step++);
+	for (int i = 0; i < g->n; i++)
+	{
+		if (distance[i] == INF)
+			printf(" * ");
+		else
+			printf("%2d ", distance[i]);
 
-    for (i = 0; i < g->n; i++) {
-        u = get_min_vertex(g->n);
-        selected[u] = TRUE;
-        if (distance[u] == INF)return;
-        printf("정점 %d 추가 \n", u+1);
-        for (v = 0; v < g->n; v++) {
-            if (g->weight[u][v] != INF) {
-                if (!selected[v] && g->weight[u][v] < distance[v]) {
-                    distance[v] = g->weight[u][v];
-                }
-            }
-        } 
-    }
-
+	}
+	printf("\n");
+	printf(" found: ");
+	for (int i = 0; i < g->n; i++)
+		printf("%2d ", found[i]);
+	printf("\n\n");
 }
-int main() {
-    GraphType g = { 10,
-        {{0,3,INF,INF,INF,11,12,INF,INF,INF},
-        {3,0,5,4,1,7,8,INF,INF,INF},
-        {INF,5,0,2,INF,INF,6,5,INF,INF},
-        {INF,4,2,0,13,INF,INF,14,INF,16},
-        {INF,1,INF,13,0,9,INF,INF,18,17},
-        {11,7,INF,INF,9,0,INF,INF,INF,INF},
-        {12,8,6,INF,INF,INF,0,13,INF,INF},
-        {INF,INF,5,14,INF,INF,13,0,INF,15},
-        {INF,INF,INF,INF,18,INF,INF,INF,0,10},
-        {INF,INF,INF,16,17,INF,INF,15,10,0}}
-    };
-    prim(&g, 0);
-    return 0;
+
+void shortest_path(GraphType* g, int start)
+{
+	int i, u, w,j;
+	int array[10];
+	for (i = 0; i < g->n; i++)
+	{
+		distance[i] = g->weight[start][i];
+		found[i] = FALSE;
+
+	}
+	found[start] = TRUE;
+	distance[start] = 0;
+	for (i = 0; i < g->n; i++)
+	{
+		printf_status(g);
+		u = choose(distance, g->n, found);
+		found[u] = TRUE;
+		for (w = 0; w < g->n; w++)
+			if (!found[w])
+				if (distance[u] + g->weight[u][w] < distance[w])
+					distance[w] = distance[u] + g->weight[u][w];
+		array[i] = u+1;
+	}
+	printf("\n");
+	for (j = 0; j < g->n; j++) {
+		printf("%d ", array[j]);
+	}
+}
+
+int main(void)
+{
+	GraphType g = { 10,
+		{{0,3,INF,INF,INF,11,12,INF,INF,INF},
+		{3,0,5,4,1,7,8,INF,INF,INF},
+		{INF,5,0,2,INF,INF,6,5,INF,INF},
+		{INF,4,2,0,13,INF,INF,14,INF,16},
+		{INF,1,INF,13,0,9,INF,INF,18,17},
+		{11,7,INF,INF,9,0,INF,INF,INF,INF},
+		{12,8,6,INF,INF,INF,0,13,INF,INF},
+		{INF,INF,5,14,INF,INF,13,0,INF,15},
+		{INF,INF,INF,INF,18,INF,INF,INF,0,10},
+		{INF,INF,INF,16,17,INF,INF,15,10,0}}
+	};
+	shortest_path(&g, 0);
+	
+	return 0;
 }
