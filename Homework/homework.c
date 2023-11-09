@@ -48,7 +48,7 @@ void printf_status(GraphType* g)
 
 void shortest_path(GraphType* g, int start)
 {
-	int i, u, w,j;
+	int i, u, w, j;
 	int array[10];
 	for (i = 0; i < g->n; i++)
 	{
@@ -92,6 +92,6 @@ int main(void)
 	};
 	printf("인접 행렬로 구현\n");
 	shortest_path(&g, 0);
-	
+
 	return 0;
 }
