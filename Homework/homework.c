@@ -12,62 +12,35 @@ typedef struct GraphType {
     int weight[MAX][MAX]; // 간선 가중치를 저장한 인접 행렬
 } GraphType;
 
-int found[MAX]; // 방문 여부를 나타내는 배열
-int distance[MAX]; // 시작 노드로부터의 최단 거리를 나타내는 배열
+int A[MAX][MAX];
 
-// 최소 거리를 선택하는 함수
-int choose(int distance[], int n, int found[]) {
-    int i, min, minpos;
-    min = INT_MAX;
-    minpos = -1;
-    for (i = 0; i < n; i++)
-        if (distance[i] < min && !found[i]) {
-            min = distance[i];
-            minpos = i;
-        }
-    return minpos;
-}
 
-// 현재 상태를 출력하는 함수
-void printf_status(GraphType* g) {
-    printf("Distance: ");
-    for (int i = 0; i < g->n; i++) {
-        if (distance[i] == INF)
-            printf(" * "); // 최단 거리가 무한대인 경우
-        else
-            printf("%2d ", distance[i]);
-    }
-    printf("\n");
-    printf(" found: ");
-    for (int i = 0; i < g->n; i++)
-        printf("%2d ", found[i]);
-    printf("\n\n");
-}
 
-// 다익스트라 알고리즘으로 최단 경로를 찾는 함수
-void shortest_path(GraphType* g, int start) {
-    int i, u, w, j;
-    int array[10]; // 최단 경로를 저장하는 배열
+void floyd(GraphType* g,int a,int b) {
+    int i, j, k;
     for (i = 0; i < g->n; i++) {
-        distance[i] = g->weight[start][i]; // 시작 노드에서의 거리 초기화
-        found[i] = FALSE; // 방문 여부 초기화
+        for (j = 0; j < g->n; j++) {
+            A[i][j] = g->weight[i][j];
+        }
     }
-    found[start] = TRUE; // 시작 노드 방문 표시
-    distance[start] = 0; // 시작 노드의 거리는 0
-    array[0] = start + 1; // 시작 노드 추가
-    for (i = 1; i < (g->n); i++) {
-        printf_status(g); // 현재 상태 출력
-        u = choose(distance, g->n, found); // 다음 방문할 노드 선택
-        found[u] = TRUE; // 해당 노드 방문 표시
-        for (w = 0; w < g->n; w++)
-            if (!found[w])
-                if (distance[u] + g->weight[u][w] < distance[w])
-                    distance[w] = distance[u] + g->weight[u][w]; // 최단 거리 갱신
-        array[i] = u + 1; // 최단 경로 배열에 추가
+
+    for (k = 0; k < g->n; k++) {
+        for (i = 0; i < g->n; i++) {
+            for (j = 0; j < g->n; j++) {
+                if (A[i][k] + A[k][j] < A[i][j]) {
+                    A[i][j] = A[i][k] + A[k][j];
+                    
+                }
+            }
+        }
+        
     }
-    for (j = 0; j < g->n; j++) {
-        printf("%d ", array[j]); // 최단 경로 출력
-    }
+    printf("Shortest distance : %d ", A[a][b]);
+}
+
+// Function to print the shortest path from i to j
+void printShortestPath(int i, int j) {
+
 }
 
 int main(void) {
@@ -84,7 +57,24 @@ int main(void) {
                           {INF,INF,INF,16,17,INF,INF,15,10,0}} };
 
     printf("인접 행렬로 구현\n");
-    shortest_path(&g, 0); // 다익스트라 알고리즘 호출
+
+
+    int start, end;
+    printf("Floyd-Warshall Algorithm\n");
+    while (1) {
+        printf("Strat Node: ");
+        scanf_s("%d", &start);
+        printf("End Node: ");
+        scanf_s("%d", &end);
+ 
+        floyd(&g, start - 1, end - 1);
+        printf("\n");
+        printf("\n");
+        if (end == 9) {
+            break;
+        }
+    }
+
 
     return 0;
 }
