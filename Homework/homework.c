@@ -7,41 +7,42 @@
 #define MAX 100
 #define INF 1000000
 
+// 그래프를 나타내는 구조체 정의
 typedef struct GraphType {
-    int n; // 그래프의 노드 수
-    int weight[MAX][MAX]; // 간선 가중치를 저장한 인접 행렬
+    int n;                  // 그래프의 노드 수
+    int weight[MAX][MAX];   // 간선 
 } GraphType;
 
 int A[MAX][MAX];
 
-
-
-void floyd(GraphType* g,int a,int b) {
+// 플로이드-워셜 알고리즘
+void floyd(GraphType* g, int a, int b) {
     int i, j, k;
+
+    // 초기화 단계
     for (i = 0; i < g->n; i++) {
         for (j = 0; j < g->n; j++) {
             A[i][j] = g->weight[i][j];
         }
     }
 
+    // 플로이드-워셜 알고리즘 수행
     for (k = 0; k < g->n; k++) {
         for (i = 0; i < g->n; i++) {
             for (j = 0; j < g->n; j++) {
+                // 더 짧은 경로를 찾으면 업데이트
                 if (A[i][k] + A[k][j] < A[i][j]) {
                     A[i][j] = A[i][k] + A[k][j];
-                    
                 }
             }
         }
-        
     }
+
+    // 결과 출력
     printf("Shortest distance : %d ", A[a][b]);
 }
 
-// Function to print the shortest path from i to j
-void printShortestPath(int i, int j) {
 
-}
 
 int main(void) {
     // 그래프 초기화
@@ -55,9 +56,6 @@ int main(void) {
                           {INF,INF,5,14,INF,INF,13,0,INF,15},
                           {INF,INF,INF,INF,18,INF,INF,INF,0,10},
                           {INF,INF,INF,16,17,INF,INF,15,10,0}} };
-
-    printf("인접 행렬로 구현\n");
-
 
     int start, end;
     printf("Floyd-Warshall Algorithm\n");
