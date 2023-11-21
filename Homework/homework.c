@@ -1,78 +1,87 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#define MAX 20
+#define SWAP(x,y,t)((t)=(x),(x)=(y),(y)=(t))
 
-#define TRUE 1
-#define FALSE 0
-#define MAX 100
-#define INF 1000000
+int list[MAX];
+int n,cnt1,cnt2;
 
-// 그래프를 나타내는 구조체 정의
-typedef struct GraphType {
-    int n;                  // 그래프의 노드 수
-    int weight[MAX][MAX];   // 간선 
-} GraphType;
+void selection_sort(int list[], int n)
+{
+	int sum1 = 0;
+	int sum2 = 0;
+	int average_compare_cnt = 0;
+	int average_move_cnt = 0;
+	int i, j,k,l, least, temp;
+	for (l = 0; l < MAX; l++) {
+		for (i = 0; i < n - 1; i++) {
+			least = i;
 
-int A[MAX][MAX];
+			for (j = i + 1; j < n; j++) {
+				cnt2++;
+				if (list[j] < list[least])
+				{
+					least = j;
 
-// 플로이드-워셜 알고리즘
-void floyd(GraphType* g, int a, int b) {
-    int i, j, k;
+				}
+			}
+			SWAP(list[i], list[least], temp);
+			cnt1++;
+			if (l == 0)
+			{
+				for (k = 0; k < n; k++) {
+					printf("%d ", list[k]);
+				}
+				printf("\n");
 
-    // 초기화 단계
-    for (i = 0; i < g->n; i++) {
-        for (j = 0; j < g->n; j++) {
-            A[i][j] = g->weight[i][j];
-        }
-    }
+			}
 
-    // 플로이드-워셜 알고리즘 수행
-    for (k = 0; k < g->n; k++) {
-        for (i = 0; i < g->n; i++) {
-            for (j = 0; j < g->n; j++) {
-                // 더 짧은 경로를 찾으면 업데이트
-                if (A[i][k] + A[k][j] < A[i][j]) {
-                    A[i][j] = A[i][k] + A[k][j];
-                }
-            }
-        }
-    }
+		}
+		sum1 += cnt1;
+		sum2 += cnt2;
+		cnt1 = 0;
+		cnt2 = 0;
+	}
+	average_compare_cnt = sum2 / 20;
+	average_move_cnt = sum1 / 20;
+	printf("Move Count average: %d\n", average_move_cnt);
+	printf("Compare Count average: %d\n", average_compare_cnt);
 
-    // 결과 출력
-    printf("Shortest distance : %d ", A[a][b]);
 }
 
+void insertion_sort(int list[], int n) {
+	int i,j,key;
+	for (i = 1; i < n; i++) {
+		key = list[i];
+		for (j = i - 1; j >= 0 && list[j] > key; j--)
+			list[j + 1] = list[j];
+		list[j + 1] = key;
+	}
+}
+
+void bubble_sort(int list[],int n){
+	int i, j, temp;
+	for (i = n-1; i >0; i--) {
+		for (j = 0;j<i; j++)
+			if (list[j] < list[j+1])
+			{
+				SWAP(list[j], list[j + 1], temp);
+		
+			}
+	}
+}
+
+int main(void)
+{
+	int i;
+	n = MAX;
+	srand(time(NULL));
+	for (i = 0; i < n; i++) {
+		list[i] = rand() % 100;
+	}
+	
+	selection_sort(list, n);
 
 
-int main(void) {
-    // 그래프 초기화
-    GraphType g = { 10, {{0,3,INF,INF,INF,11,12,INF,INF,INF},
-                          {3,0,5,4,1,7,8,INF,INF,INF},
-                          {INF,5,0,2,INF,INF,6,5,INF,INF},
-                          {INF,4,2,0,13,INF,INF,14,INF,16},
-                          {INF,1,INF,13,0,9,INF,INF,18,17},
-                          {11,7,INF,INF,9,0,INF,INF,INF,INF},
-                          {12,8,6,INF,INF,INF,0,13,INF,INF},
-                          {INF,INF,5,14,INF,INF,13,0,INF,15},
-                          {INF,INF,INF,INF,18,INF,INF,INF,0,10},
-                          {INF,INF,INF,16,17,INF,INF,15,10,0}} };
-
-    int start, end;
-    printf("Floyd-Warshall Algorithm\n");
-    while (1) {
-        printf("Strat Node: ");
-        scanf_s("%d", &start);
-        printf("End Node: ");
-        scanf_s("%d", &end);
- 
-        floyd(&g, start - 1, end - 1);
-        printf("\n");
-        printf("\n");
-        if (end == 9) {
-            break;
-        }
-    }
-
-
-    return 0;
+	return 0;
 }
