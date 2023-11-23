@@ -82,7 +82,7 @@ int main(void)
 	int i;
 	n = MAX;
 	srand(time(NULL));
-	printf("\n Selection sort\n\n");
+	printf("Selection sort\n\n");
 	for (round = 0; round < n; round++) {
 		cnt1 = 0;
 		cnt2 = 0;
