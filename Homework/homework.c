@@ -12,13 +12,12 @@ int average_move_cnt = 0;
 //선택 정렬
 void selection_sort(int list[], int n)
 {
-
-
 	int i, j,k,l, least, temp;
 
 	for (i = 0; i < n - 1; i++) {
 		least = i;
 		for (j = i + 1; j < n; j++) {
+			//비교횟수
 			cnt2++;
 			if (list[j] < list[least])
 			{
@@ -27,6 +26,7 @@ void selection_sort(int list[], int n)
 			}
 		}
 		SWAP(list[i], list[least], temp);
+		//이동횟수
 		cnt1++;
 		if (round == 0)
 		{
@@ -37,7 +37,7 @@ void selection_sort(int list[], int n)
 		}
 	}
 }
-// 삽입 정렬 미완성
+// 삽입 정렬 
 void insertion_sort(int list[], int n) {
 	int i,j,k,key;
 	for (i = 1; i < n; i++) {
@@ -45,6 +45,7 @@ void insertion_sort(int list[], int n) {
 		for (j = i - 1; j >= 0 && list[j] > key; j--)
 		{
 			list[j + 1] = list[j];
+			//비교횟수
 			cnt2++;
 		}
 		if (round == 0) {
@@ -54,10 +55,11 @@ void insertion_sort(int list[], int n) {
 			printf("\n");
 		}
 		list[j + 1] = key;
+		//이동횟수
 		cnt1++;
 	}
 }
-//버블정렬 미구현
+//버블정렬
 void bubble_sort(int list[],int n){
 	int i, j, temp;
 	for (i = n-1; i >0; i--) {
@@ -65,6 +67,7 @@ void bubble_sort(int list[],int n){
 			if (list[j] < list[j+1])
 			{
 				SWAP(list[j], list[j + 1], temp);
+				//비교횟수
 				cnt2++;
 			}
 		if (round == 0) {
@@ -73,6 +76,7 @@ void bubble_sort(int list[],int n){
 			}
 			printf("\n");
 		}
+		//이동횟수
 		cnt1++;
 	}
 }
@@ -83,18 +87,20 @@ int main(void)
 	n = MAX;
 	srand(time(NULL));
 	printf("Selection sort\n\n");
+	//20 라운드 반복
 	for (round = 0; round < n; round++) {
 		cnt1 = 0;
 		cnt2 = 0;
+		//랜덤 수 생성 후 배열 저장
 		for (i = 0; i < n; i++) {
 			list[i] = rand() % 100;
-
 		}
-
+		//정렬 함수 호출
 		selection_sort(list, n);
 		sum1 += cnt1;
 		sum2 += cnt2;
 	}
+
 	average_compare_cnt = sum2/MAX;
 	average_move_cnt = (sum1)/MAX;
 
