@@ -96,7 +96,7 @@ int main(void)
 		sum2 += cnt2;
 	}
 	average_compare_cnt = sum2/MAX;
-	average_move_cnt = (sum1-1)/MAX;
+	average_move_cnt = (sum1)/MAX;
 
 	printf("Move Count: %d\n",cnt1);
 	printf("Compare Count: %d", cnt2);
