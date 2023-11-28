@@ -1,36 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX 20
-#define SWAP(x,y,t)((t)=(x),(x)=(y),(y)=(t))
 
 int sorted[MAX];
 int list[MAX];
-int n,cnt1,cnt2,sum1,sum2,round;
+int n,cnt1,cnt2,sum1,sum2,round,cnt3;
 int average_compare_cnt = 0;
 int average_move_cnt = 0;
 //gap 만큼 떨어진 요소들을 삽입 정렬
 // 정렬의 범위 first~last
-inc_insertion_sort(int list[], int first, int last, int gap) {
-	int i, j, key;
-	for (i = first + gap; i <= last; i = i + gap) {
-		key = list[i];
-		for (j = i - gap; j >= first && key < list[j]; j = j - gap) {
-			list[j + gap] = list[j];
-			cnt1++;
+void merge(int list[], int left, int mid, int right)
+{
+	cnt1 = 0;
+	cnt3 = 0;
+	int i, j, k, l;
+	i = left;
+	j = mid + 1;
+	k = left;
+
+	//분할 정렬된 리스트의 합병
+	while (i <= mid && j <= right)
+	{
+		if (list[i] <= list[j])
+		{
+			sorted[k++] = list[i++];
+			
 		}
-		list[j + gap] = key;
-		cnt2++;
+		else {
+			sorted[k++] = list[j++];
+			
+		}
+		cnt1++;
 	}
+
+	//남은 요소들 배열에 복사
+	
+	if (i > mid) {
+		for (l = j; l <= right; l++) {
+			sorted[k++] = list[l];
+			
+		}	
+		
+	}
+	else{
+		for (l = i; l <= mid; l++) {
+			sorted[k++] = list[l];
+		}
+		
+		
+	}
+	cnt3++;
+	
+	// sorted 배열의 list[]로 재복사
+	for (l = left; l <= right; l++)
+		list[l] = sorted[l];
+
 }
 
-void shell_sort(int list[], int n) {
-	int i, gap;
-	for (gap = n / 2; gap > 0; gap = gap / 2) {
-		if ((gap % 2) == 0)gap++;
-		for (i = 0; i < gap; i++) //부분리스트의 개수= gap
-		{
-			inc_insertion_sort(list, i, n - 1, gap);
-		}
+void merge_sort(int list[], int left, int right)
+{
+	cnt3 = 0;
+	cnt2 = 0;
+	int mid;
+	if (left < right)
+	{
+		mid = (left + right) / 2;			// 중간을 위치를 구해 배열을 분할한다. -> 분할
+		
+		merge_sort(list, left, mid);		// 배열의 앞 부분을 정렬한다. -> 정복
+		cnt2++;
+		merge_sort(list, mid + 1, right);	// 배열의 뒷 부분을 정렬한다. -> 정복
+		cnt2++;
+		merge(list, left, mid, right);		// 정렬될 2개의 배열을 합병한다. -> 합병
+		cnt2++;
 		if (round == 0)
 		{
 			for (int k = 0; k < n; k++) {
@@ -38,11 +79,11 @@ void shell_sort(int list[], int n) {
 			}
 			printf("\n");
 		}
-	}
-	sum1 += cnt1;
+
+	}	
+	sum1 += cnt1 *cnt3;
 	sum2 += cnt2;
 }
-
 int main(void)
 {
 	int i;
@@ -51,27 +92,25 @@ int main(void)
 	srand(time(NULL));
 
 	for (round = 0; round < n; round++) {
-		cnt1 = 0;
+		
 		for (i = 0; i < n; i++) {
 			list[i] = rand() % 100;
-			if (round == 0) {
-				before_list[i] = list[i];
-			}
-
 		}
-
 	}
 
 	printf("Original list: ");
 	for (round = 0; round < n; round++) {
-		printf("%d ", before_list[round]);
+		for (i = 0; i < n; i++) {
+			if (i == 0) {
+				printf("%d ", list[round]);
+			}
+		}
 	}
 	printf("\n\n");
 	for (round = 0; round < n; round++) {
 		
-		cnt2 = 0;
-
-		shell_sort(list, n);
+		merge_sort(list, 0, n-1);
+		
 	}
 
 	printf("\n");
