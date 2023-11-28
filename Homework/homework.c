@@ -7,7 +7,7 @@ int list[MAX];
 int n,cnt1,cnt2,sum1,sum2,round,cnt3;
 int average_compare_cnt = 0;
 int average_move_cnt = 0;
-//gap 만큼 떨어진 요소들을 삽입 정렬
+
 // 정렬의 범위 first~last
 void merge(int list[], int left, int mid, int right)
 {
