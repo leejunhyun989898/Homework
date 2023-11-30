@@ -7,6 +7,7 @@ int list[MAX];
 int n,round;
 float cnt1, cnt2, sum1, sum2;
 
+// 퀵소트에서 배열을 분할하는 함수
 int partition(int list[],int left, int right) {
 	cnt1 = 0;
 	cnt2 = 0;
@@ -32,19 +33,20 @@ int partition(int list[],int left, int right) {
 	if (SWAP(list[left], list[high], temp)) {
 		cnt1++;
 	}
-	
+	//총 이동횟수
 	sum1 += cnt1;
 	cnt2++;
 	return high;
 
 }
+// 퀵소트를 수행
 void quick_sort(int list[], int left, int right) {
 
 	if (left < right) {
 		int q = partition(list, left, right);
 		quick_sort(list, left, q - 1);
 		quick_sort(list, q + 1, right);
-		
+		//배열을 출력 (첫 번째 라운드에서만)
 		if (round == 0)
 		{
 			for (int k = 0; k < n; k++) {
@@ -53,6 +55,7 @@ void quick_sort(int list[], int left, int right) {
 			printf("\n");
 		}
 	}
+	//총 비교횟수
 	sum2 += cnt2;
 }
 
